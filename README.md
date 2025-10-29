@@ -159,9 +159,9 @@ BibTeX (update authors/years upon acceptance):
 ```bibtex
 @article{abgnn_biodiversity_under_review,
   title   = {A Graph Neural Network Approach for Aquatic Biodiversity Prediction Leveraging Water System Interconnections},
-  author  = {<Update with authors>},
+  author  = {Byeongkeun Kwon and Dain Lee and Hyunjun Ko and Hanbin Lee and Hyeonjun Hwang and Suhyeon Kim},
   journal = {Ecological Informatics},
-  note    = {Under review},
+  note    = {Under review. * Equal contribution: Byeongkeun Kwon and Dain Lee. \textdagger{} Co-corresponding authors: Hyeonjun Hwang and Suhyeon Kim.},
   year    = {2025}
 }
 ```
