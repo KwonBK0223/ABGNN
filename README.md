@@ -82,7 +82,7 @@ Hardware used: Intel Core **i9-14900K** CPU + **2× RTX 4090** GPUs.
 
 ## Training
 
-Sequential **7:1** split (first 7/8 = train, last 1/8 = test), no shuffle.
+Sequential **7:1** split (first 7/8 = train, last 1/8 = test; 2018–2022=train, 2023=test), no shuffle.
 
 ```bash
 python experiments/train.py \
@@ -140,7 +140,7 @@ python experiments/extract_attention.py \
 
 * Seed fixed to `42` (numpy/torch/cuda).
 * Undirected edges normalized to `(min, max)` then deduplicated.
-* Time replication uses `--block_size` (default `183`).
+* Time replication uses `--block_size` (default `183`, half year).
 * Subgraph ordering made deterministic via a middle-region–based key before the sequential split.
 
 ---
@@ -161,7 +161,7 @@ BibTeX (update authors/years upon acceptance):
   title   = {A Graph Neural Network Approach for Aquatic Biodiversity Prediction Leveraging Water System Interconnections},
   author  = {Byeongkeun Kwon and Dain Lee and Hyunjun Ko and Hanbin Lee and Hyeonjun Hwang and Suhyeon Kim},
   journal = {Ecological Informatics},
-  note    = {Under review. * Equal contribution: Byeongkeun Kwon and Dain Lee. \textdagger{} Co-corresponding authors: Hyeonjun Hwang and Suhyeon Kim.},
+  note    = {Under review. Equal contribution: Byeongkeun Kwon and Dain Lee. Co-corresponding authors: Hyeonjun Hwang and Suhyeon Kim.},
   year    = {2025}
 }
 ```
