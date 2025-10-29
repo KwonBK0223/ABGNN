@@ -174,7 +174,7 @@ BibTeX (update authors/years upon acceptance):
 
 ## License
 
-Released under the **MIT License**. See [LICENSE](#license-1) for details.
+Released under the **MIT License**. See [LICENSE](#https://github.com/KwonBK0223/ABGNN/blob/main/LICENSE) for details.
 
 ---
 
