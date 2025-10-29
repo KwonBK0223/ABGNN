@@ -1,0 +1,38 @@
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+*.pkl
+*.egg-info/
+.eggs/
+build/
+dist/
+.coverage
+.pytest_cache/
+
+# --- Environments ---
+.env
+.venv/
+venv/
+env/
+
+# --- OS / IDE ---
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# --- Experiment outputs ---
+checkpoints/
+artifacts/
+runs/
+logs/
+lightning_logs/
+
+# --- Important: keep preprocessed CSVs tracked ---
+# data/*.csv  <-- DO NOT ignore; included in the repo
+# If you later add large raw files, ignore like:
+# data/raw/
+# data/*.zip
