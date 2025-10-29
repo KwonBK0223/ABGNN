@@ -180,7 +180,8 @@ Released under the **MIT License**. See [LICENSE](#https://github.com/KwonBK0223
 
 ## Contact
 
-For questions and collaborations, please open an issue or contact the authors.
+For questions and collaborations, please open an issue or contact the authors.<br>
+house9895@knu.ac.kr
 
 ---
 
