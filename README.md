@@ -29,8 +29,6 @@ ABGNN/
 │  ├─ new_water3.csv
 │  ├─ new_water4.csv
 │  ├─ new_water5.csv
-│  ├─ small_edge.csv
-│  ├─ middle_edge.csv
 │  └─ bio_final.csv
 │
 ├─ .gitignore             # keep caches/ckpts out of git; CSVs remain tracked
