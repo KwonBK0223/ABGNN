@@ -15,7 +15,7 @@ ABGNN/
 │  ├─ __init__.py
 │  ├─ model.py            # ABGNN architecture (GAT stack + subgraph mean pooling)
 │  ├─ utils.py            # seeding & small helpers
-│  ├─ io.py               # load preprocessed CSVs (EUC-KR)
+│  ├─ io.py               # load preprocessed CSVs
 │  ├─ graph_builder.py    # build heterogeneous graph + tensors
 │  └─ dataset.py          # DataLoader bridge (sequential 7:1 split; 2018–2022=train, 2023=test)
 │
@@ -55,30 +55,26 @@ Hardware used: Intel Core **i9-14900K** CPU + **2× RTX 4090** GPUs.
 
 ## Data
 
-* **Included:** preprocessed CSVs under `./data` (encoding: **euc-kr**).
+* **Included:** preprocessed CSVs under `./data`.
 * **Not shared:** raw/original data (license/privacy constraints).
 
-**Terminology / 용어**
-* 측정소 → *observation-point*
-* 중권역 → *sub-basin*
-
-**CSV expectations (KOR/ENG)**
+**CSV expectations**
 * `new_water.csv`:  
   columns include  
-  `id`, `측정소명 (observation-point name)`, `중권역_id (sub-basin ID)`, `중권역명 (sub-basin name)`, and 9 water-quality features:  
-  • `수온 (water temperature)`  
-  • `용존산소량 (dissolved oxygen)`  
-  • `화학적산소요구량 (chemical oxygen demand; COD)`  
-  • `총질소 (total nitrogen)`  
-  • `총인 (total phosphorus)`  
-  • `수소이온농도 (pH)`  
-  • `전기전도도 (electrical conductivity)`  
-  • `염분 (salinity)`  
-  • `탁도 (turbidity)`
+  `observation_point_id`, `observation_point`, `sub_basin_id`, `sub_basin`, and 9 water-quality features:  
+  • `water_temp (water temperature)`  
+  • `BOD (Biochemical Oxygen Demand)`  
+  • `COD (chemical oxygen demand; COD)`  
+  • `TN (total nitrogen)`  
+  • `TP (total phosphorus)`  
+  • `pH (pH)`  
+  • `EC (electrical conductivity)`  
+  • `salinity (salinity)`  
+  • `turbidity (turbidity)`
 * `small_edge.csv`, `middle_edge.csv`: undirected edges with `node1`,`node2`
   (the code canonically normalizes to `(min, max)` and deduplicates)
 * `bio_final.csv`:  
-  `중권역 명 (sub-basin name)`, `년 (year)`, `회 (period; biannual: 1=H1, 2=H2)`, … and **target** (biodiversity index) in the last column
+  `sub_basin (sub-basin name)`, `year (year)`, `collection_round (period; biannual: 1=H1, 2=H2)`, … and **target** (biodiversity index) in the last column
 
 ---
 
@@ -89,7 +85,6 @@ Sequential **7:1** split (first 7/8 = train, last 1/8 = test; 2018–2022=train,
 ```bash
 python experiments/train.py \
   --data_dir ./data \
-  --encoding euc-kr \
   --block_size 183 \
   --epochs 1000 \
   --eval_every 100 \
@@ -111,7 +106,6 @@ python experiments/train.py \
 ```bash
 python experiments/extract_attention.py \
   --data_dir ./data \
-  --encoding euc-kr \
   --block_size 183 \
   --ckpt ./checkpoints/abgnn_best.pt \
   --out_dir ./artifacts
@@ -129,9 +123,9 @@ python experiments/extract_attention.py \
 
 * **Layers**
 
-  * Observation points (소권역): `GATConv` for **space** and **time**
+  * Observation points: `GATConv` for **space** and **time**
   * Obs → Sub-basin aggregation: `GATConv`
-  * Sub-basin (중권역): `GATConv` for **space** and **time**
+  * Sub-basin: `GATConv` for **space** and **time**
 * **Pooling:** connected-component (subgraph) **mean pooling**
 * **Head:** MLP → scalar regression (biodiversity)
 * **Loss:** MSE

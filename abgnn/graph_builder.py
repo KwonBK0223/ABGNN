@@ -45,35 +45,50 @@ def build_graph(
 
     # Prefixing
     water = water.copy()
-    water["id"] = "소_" + water["id"].astype(str)
-    water["측정소명"] = "소_" + water["측정소명"].astype(str)
-    water["중권역_id"] = "중_" + water["중권역_id"].astype(str)
-    water["중권역명"] = "중_" + water["중권역명"].astype(str)
+    water["observation_point_id"] = "ob_" + water["observation_point_id"].astype(str)
+    water["observation_point"] = "ob_" + water["observation_point"].astype(str)
+    water["sub_basin_id"] = "sub_" + water["sub_basin_id"].astype(str)
+    water["sub_basin"] = "sub_" + water["sub_basin"].astype(str)
 
     small_edge = small_edge.copy()
-    small_edge["node1"] = "소_" + small_edge["node1"].astype(str)
-    small_edge["node2"] = "소_" + small_edge["node2"].astype(str)
+    small_edge["node1"] = "ob_" + small_edge["node1"].astype(str)
+    small_edge["node2"] = "ob_" + small_edge["node2"].astype(str)
 
     middle_edge = middle_edge.copy()
-    middle_edge["node1"] = "중_" + middle_edge["node1"].astype(str)
-    middle_edge["node2"] = "중_" + middle_edge["node2"].astype(str)
+    middle_edge["node1"] = "sub_" + middle_edge["node1"].astype(str)
+    middle_edge["node2"] = "sub_" + middle_edge["node2"].astype(str)
 
     # Bio table ordering and naming
-    bio = bio.sort_values(["중권역 명", "년", "회"]).reset_index(drop=True)
-    _exclude = ["삼척오십천", "삽교천", "영강", "요천", "용담댐하류", "위천", "임하댐", "초강", "충주댐하류",
-                "탐진강", "한강서해", "한탄강", "형산강", "홍천강", "황룡강", "회야강", "회천"]
-    bio = bio.loc[~bio["중권역 명"].isin(_exclude)].reset_index(drop=True)
-    bio["중권역 명"] = "중_" + bio["중권역 명"].astype(str)
+    bio = bio.sort_values(["sub_basin", "year", "collection_round"]).reset_index(drop=True)
+    _exclude = ['Samcheokosipcheon',
+                'Sapgyocheon',
+                'Yeonggang',
+                'Yocheon',
+                'Yongdamdaemharyu',
+                'Wicheon',
+                'Imhadaem',
+                'Chogang',
+                'Chungjudaemharyu',
+                'Tamjingang',
+                'Hangang_Seohae',
+                'Hantangang',
+                'Hyeongsangang',
+                'Hongcheongang',
+                'Hwangryonggang',
+                'Hoeyagang',
+                'Hoecheon']
+    bio = bio.loc[~bio["sub_basin"].isin(_exclude)].reset_index(drop=True)
+    bio["sub_basin"] = "sub_" + bio["sub_basin"].astype(str)
 
     # Drop unused cols if exist
-    for c in ["위도", "경도", "month", "day", "year"]:
+    for c in ["latitude", "longitude", "month", "day", "year"]:
         if c in water.columns:
             water = water.drop(columns=[c])
 
     # Half-year key
-    bio["년"] = bio["년"] + (bio["회"] - 1) * 0.5
+    bio["year"] = bio["year"] + (bio["collection_round"] - 1) * 0.5
 
-    mid_bio_edge = water[["중권역_id", "중권역명"]].reset_index(drop=True)
+    mid_bio_edge = water[["sub_basin_id", "sub_basin"]].reset_index(drop=True)
 
     # Suffixing rules
     years = ["_2018.0", "_2018.5", "_2019.0", "_2019.5", "_2020.0", "_2020.5",
@@ -82,15 +97,15 @@ def build_graph(
     rep = 12
     mid_bio_edge = mid_bio_edge.assign(tmp=list(range(rep)) * (len(mid_bio_edge) // rep or 1))
     mid_bio_edge["tmp"] = mid_bio_edge["tmp"].astype(str)
-    mid_bio_edge["중권역명"] = "bio_" + (mid_bio_edge["중권역명"] + "_" + mid_bio_edge["tmp"])
+    mid_bio_edge["sub_basin"] = "bio_" + (mid_bio_edge["sub_basin"] + "_" + mid_bio_edge["tmp"])
     mid_bio_edge = mid_bio_edge.drop(columns=["tmp"]).reset_index(drop=True)
 
     mid_bio_edge = mid_bio_edge.assign(tmp=(years * (len(mid_bio_edge) // len(years) + 1))[: len(mid_bio_edge)])
-    mid_bio_edge["중권역명"] = mid_bio_edge["중권역명"] + mid_bio_edge["tmp"]
+    mid_bio_edge["sub_basin"] = mid_bio_edge["sub_basin"] + mid_bio_edge["tmp"]
     mid_bio_edge = mid_bio_edge.drop(columns=["tmp"]).reset_index(drop=True)
 
     bio = bio.assign(tmp=(years * (len(bio) // len(years) + 1))[: len(bio)])
-    bio["중권역 명"] = "bio_" + (bio["중권역 명"] + "_" + bio["tmp"].astype(str))
+    bio["sub_basin"] = "bio_" + (bio["sub_basin"] + "_" + bio["tmp"].astype(str))
     bio = bio.drop(columns=["tmp"]).reset_index(drop=True)
 
     # Build graph
@@ -98,24 +113,24 @@ def build_graph(
 
     # middle nodes with feature means
     middle_df = (
-        water.groupby("중권역_id")
+        water.groupby("sub_basin_id")
         .agg(
             {
-                "수온": "mean",
-                "용존산소량": "mean",
-                "화학적산소요구량": "mean",
-                "총질소": "mean",
-                "총인": "mean",
-                "수소이온농도": "mean",
-                "전기전도도": "mean",
-                "염분": "mean",
-                "탁도": "mean",
+                "water_temp": "mean",
+                "BOD": "mean",
+                "COD": "mean",
+                "TN": "mean",
+                "TP": "mean",
+                "pH": "mean",
+                "EC": "mean",
+                "salinity": "mean",
+                "turbidity": "mean",
             }
         )
         .reset_index()
     )
     for _, row in middle_df.iterrows():
-        G.add_node(row["중권역_id"], attr=row.values.tolist()[1:])
+        G.add_node(row["sub_basin_id"], attr=row.values.tolist()[1:])
 
     # middle directed edges over contiguous windows
     num_blocks = max(1, len(water) // block_size)
@@ -123,7 +138,7 @@ def build_graph(
     for i in range(num_blocks):
         tmp = water.iloc[i * block_size : (i + 1) * block_size]
         prev = None
-        for node_id in tmp["중권역_id"]:
+        for node_id in tmp["sub_basin_id"]:
             if prev is not None and prev in G and node_id in G:
                 G.add_edge(prev, node_id)
                 directed_edges_middle.append((prev, node_id))
@@ -150,15 +165,15 @@ def build_graph(
     for _, row in bio.iterrows():
         node_attributes = [0] * 9
         label_value = row.iloc[-1]
-        G.add_node(row["중권역 명"], attr=node_attributes, label=label_value)
+        G.add_node(row["sub_basin"], attr=node_attributes, label=label_value)
         subgraph_labels.append(label_value)
 
     # middle-bio links
     undirected_middle_bio = []
     for _, row in mid_bio_edge.iterrows():
-        if row["중권역_id"] in G and row["중권역명"] in G:
-            G.add_edge(row["중권역_id"], row["중권역명"])
-            undirected_middle_bio.append((row["중권역_id"], row["중권역명"]))
+        if row["sub_basin_id"] in G and row["sub_basin"] in G:
+            G.add_edge(row["sub_basin_id"], row["sub_basin"])
+            undirected_middle_bio.append((row["sub_basin_id"], row["sub_basin"]))
 
     # remove bio dummy nodes before adding small layers
     to_remove = [n for n, d in G.nodes(data=True) if "attr" in d and d["attr"] == [0] * 9]
@@ -167,14 +182,14 @@ def build_graph(
     # small nodes (features)
     for _, row in water.iterrows():
         node_attr = row.values.tolist()[4:13]
-        G.add_node(row["id"], attr=node_attr)
+        G.add_node(row["observation_point_id"], attr=node_attr)
 
     # small directed edges
     directed_edges_small = []
     for i in range(num_blocks):
         tmp = water.iloc[i * block_size : (i + 1) * block_size]
         prev = None
-        for node_id in tmp["id"]:
+        for node_id in tmp["observation_point_id"]:
             if prev is not None and prev in G and node_id in G:
                 G.add_edge(prev, node_id)
                 directed_edges_small.append((prev, node_id))
@@ -197,12 +212,12 @@ def build_graph(
             undirected_edges_small.append((row["node1"], row["node2"]))
 
     # small-middle links
-    small_middle_edge = water[["id", "중권역_id"]]
+    small_middle_edge = water[["observation_point_id", "sub_basin_id"]]
     undirected_edges_small_middle = []
     for _, row in small_middle_edge.iterrows():
-        if row["id"] in G and row["중권역_id"] in G:
-            G.add_edge(row["id"], row["중권역_id"])
-            undirected_edges_small_middle.append((row["id"], row["중권역_id"]))
+        if row["observation_point_id"] in G and row["sub_basin_id"] in G:
+            G.add_edge(row["observation_point_id"], row["sub_basin_id"])
+            undirected_edges_small_middle.append((row["observation_point_id"], row["sub_basin_id"]))
 
     # connected components as subgraphs
     subgraphs = [G.subgraph(c).copy() for c in nx.connected_components(G)]
@@ -210,7 +225,7 @@ def build_graph(
     # deterministic ordering by a simple key
     subgraph_keys = []
     for sg in subgraphs:
-        mids = [n for n in sg.nodes if str(n).startswith("중_")]
+        mids = [n for n in sg.nodes if str(n).startswith("sub_")]
         key = mids[0] if len(mids) > 0 else list(sg.nodes())[0]
         subgraph_keys.append(str(key))
 
