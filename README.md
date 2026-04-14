@@ -2,7 +2,7 @@
 
 # A Graph Neural Network Approach for Aquatic Biodiversity Prediction Leveraging Water System Interconnections
 
-**Status:** Under review at *Ecological Informatics* <br>
+**Status:** Accepted at *Ecological Informatics* **(JCR 5.2%)**<br>
 **Goal:** Build a heterogeneous water-system graph (observation points ↔ sub-basins ↔ biodiversity) and predict aquatic biodiversity with a GNN that models spatial/temporal relations.
 
 ---
