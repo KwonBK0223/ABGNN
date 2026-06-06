@@ -157,8 +157,8 @@ BibTeX (update authors/years upon acceptance):
   title   = {A Graph Neural Network Approach for Aquatic Biodiversity Prediction Leveraging Water System Interconnections},
   author  = {Byeongkeun Kwon and Dain Lee and Hyunjun Ko and Hanbin Lee and Hyeonjun Hwang and Suhyeon Kim},
   journal = {Ecological Informatics},
-  note    = {Under review. Equal contribution: Byeongkeun Kwon and Dain Lee. Co-corresponding authors: Hyeonjun Hwang and Suhyeon Kim.},
-  year    = {2025}
+  note    = {Equal contribution: Byeongkeun Kwon and Dain Lee. Co-corresponding authors: Hyeonjun Hwang and Suhyeon Kim.},
+  year    = {2026}
 }
 ```
 
